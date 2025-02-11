@@ -45,4 +45,6 @@ copy_dir() {
 	popd > /dev/null
 }
 
-copy_dir .config $XDG_CONFIG_HOME
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+copy_dir .config $CONFIG_DIR
