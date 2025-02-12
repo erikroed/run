@@ -58,4 +58,4 @@ copy_file() {
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 copy_dir .config $CONFIG_DIR
-copy_file .tmux.conf $HOME
+copy_file .specialconfig $HOME
