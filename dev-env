@@ -59,3 +59,4 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 copy_dir .config $CONFIG_DIR
 copy_file .specialconfig $HOME
+copy_file .bash_aliases $HOME
