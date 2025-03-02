@@ -43,3 +43,4 @@ for script in $scripts; do
     log "running script: $script"
     execute ./$script
 done
+
