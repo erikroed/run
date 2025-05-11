@@ -1,0 +1,2 @@
+cd $HOME/bin ; wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+rm kubeval-linux-amd64.tar.gz
