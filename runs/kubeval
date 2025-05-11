@@ -1,2 +1,4 @@
-cd $HOME/bin ; wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-rm kubeval-linux-amd64.tar.gz
+wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+tar xvf kubeval-linux-amd64.tar.gz
+rm kubeval-linux-amd64.tar.gz LICENSE README.md
+sudo mv kubeval /usr/local/bin/kubeval
