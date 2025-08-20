@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-git clone -b v0.10.4 https://github.com/neovim/neovim.git $HOME/projects/neovim
+git clone -b v0.11.3 https://github.com/neovim/neovim.git $HOME/projects/neovim
 sudo apt install cmake gettext lua5.1 liblua5.1-0-dev
 
 cd $HOME/projects/neovim
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install
-
-git clone https://github.com/erikroed/kickstart.nvim.git $HOME/.config/nvim
