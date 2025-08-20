@@ -2,6 +2,8 @@
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=4")
 vim.cmd("set shiftwidth=4")
+vim.cmd("set number")
+vim.cmd("set relativenumber")
 vim.g.mapleader = " "
 
 -- Lazy.nvim
@@ -30,6 +32,16 @@ local plugins = {
         branch = "main",
         build = ":TSUpdate"
     },
+    {
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+            "nvim-tree/nvim-web-devicons",
+        },
+        lazy = false
+	},
 }
 
 local opts = {}
@@ -48,6 +60,9 @@ vim.api.nvim_create_autocmd('FileType', {
     pattern = { '<filetype>' },
     callback = function() vim.treesitter.start() end,
 })
+
+-- Neotree configs
+vim.keymap.set('n', '<C-n>', ':Neotree filesystem reveal left<CR>')
 
 -- Theme
 require("catppuccin").setup()
