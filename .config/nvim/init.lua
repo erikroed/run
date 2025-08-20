@@ -38,7 +38,3 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Neotree configs
 vim.keymap.set('n', '<C-n>', ':Neotree toggle<CR>')
 
--- Theme
-require("catppuccin").setup()
-vim.cmd.colorscheme "catppuccin"
-
