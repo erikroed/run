@@ -36,7 +36,7 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- Neotree configs
-vim.keymap.set('n', '<C-n>', ':Neotree filesystem reveal left<CR>')
+vim.keymap.set('n', '<C-n>', ':Neotree toggle<CR>')
 
 -- Theme
 require("catppuccin").setup()
