@@ -31,4 +31,7 @@ vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
 
 # none-ls
 vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
+
+# lazygit
+vim.keymap.set("n", "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" })
 ```
