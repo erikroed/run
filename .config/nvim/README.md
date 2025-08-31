@@ -26,7 +26,7 @@ vim.keymap.set("n", "<C-p>", function() harpoon:list():prev() end)
 
 # lsp-config
 vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
+vim.keymap.set("n", "<C-b>", vim.lsp.buf.definition, {})
 vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
 
 # none-ls
