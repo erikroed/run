@@ -23,9 +23,6 @@ vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
 vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
 
-# neo-tree
-vim.keymap.set('n', '<C-n>', ':Neotree toggle<CR>')
-
 # none-ls
 vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
 ```
