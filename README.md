@@ -14,6 +14,6 @@ cd run
 ./run
 
 # Install dotfiles, aliases etc.
-./dev-env
+./dev
 ```
 
