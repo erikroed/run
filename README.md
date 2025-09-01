@@ -13,6 +13,12 @@ cd run
 # Install everything inside the runs folder
 ./run
 
+# Or install specific tool from the runs folder
+./run <tool>
+
+# in example for docker
+./run docker
+
 # Install dotfiles, aliases etc.
 ./dev
 ```
