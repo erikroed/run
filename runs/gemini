@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if ! command -v npm &> /dev/null; then
+    echo "Need NPM to install gemini-cli"
+    echo "Use NVM to install node + npm: "
+    echo "./run nvm"
+    echo "install npm with: "
+    echo "nvm install --lts"
+    exit 1;
+fi
+
+npm install -g @google/gemini-cli
