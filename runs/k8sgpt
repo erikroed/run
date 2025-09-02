@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+OUTPUT_DIR=$HOME/projects/k8sgpt
+
+curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/latest/download/k8sgpt_Linux_x86_64.tar.gz
+
+mkdir -p $OUTPUT_DIR
+
+tar -xzf k8sgpt_Linux_x86_64.tar.gz -C $OUTPUT_DIR/
+sudo mv $OUTPUT_DIR/k8sgpt /usr/local/bin/
+
+rm -rf $OUTPUT_DIR
+rm k8sgpt_Linux_x86_64.tar.gz
