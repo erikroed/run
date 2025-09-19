@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+sudo apt install bat
+sudo ln -s /usr/bin/batcat ~/.local/bin/bat
+
+echo -e "\nalias cat='bat '" >> ~/.bash_aliases
+
+alias cat='bat '
