@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
-git clone -b v0.11.3 https://github.com/neovim/neovim.git $HOME/projects/neovim
+# TODO: Get latest version from repo (curl endpoint for releases, get latest)
+VERSION=v0.11.5
+OUTPUT_DIR=$HOME/projects/neovim
+
+if [[ -d $OUTPUT_DIR ]]; then
+    rm -rf $OUTPUT_DIR
+fi
+
+git clone -b $VERSION https://github.com/neovim/neovim.git $HOME/projects/neovim
 sudo apt install cmake gettext lua5.1 liblua5.1-0-dev
 
-cd $HOME/projects/neovim
+cd $OUTPUT_DIR
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install
