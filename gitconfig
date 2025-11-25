@@ -32,6 +32,7 @@ create_config_file() {
 [user]
     name = Erik
     email = $email
+    signingkey = $HOME/.ssh/$profile.pub
 
 [core]
     sshCommand = "ssh -i $HOME/.ssh/$profile"
@@ -40,6 +41,9 @@ EOF
 
 update_git_root_config() {
     cat <<EOF > "$HOME/.gitconfig"
+[gpg]
+	format = ssh
+
 [includeIf "gitdir:~/projects/personal/"]
     path = ~/.config/git/personal.config
 
