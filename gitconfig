@@ -44,6 +44,9 @@ update_git_root_config() {
 [gpg]
 	format = ssh
 
+[commit]
+	gpgsign = true
+
 [includeIf "gitdir:~/projects/personal/"]
     path = ~/.config/git/personal.config
 
