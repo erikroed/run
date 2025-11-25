@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+profiles=("personal" "work")
+
+check_ssh() {
+    local profile_name=$1
+
+    local exists=1
+    if [[ -f "$HOME/.ssh/$profile_name" ]]; then
+        exists=0
+    fi
+
+    return $exists
+}
+
+check_config() {
+    local profile_name=$1
+
+    exists=1
+    if [[ -f "$HOME/.config/git/$profile_name.config" ]]; then
+        exists=0
+    fi
+
+    return $exists
+}
+
+create_config_file() {
+    local profile=$1
+    local email=$2
+
+    cat <<EOF > "$HOME/.config/git/$profile.config"
+[user]
+    name = Erik
+    email = $email
+
+[core]
+    sshCommand = "ssh -i $HOME/.ssh/$profile"
+EOF
+}
+
+update_git_root_config() {
+    cat <<EOF > "$HOME/.gitconfig"
+[includeIf "gitdir:~/projects/personal/"]
+    path = ~/.config/git/personal.config
+
+[includeIf "gitdir:~/projects/work/"]
+    path = ~/.config/git/work.config
+EOF
+}
+
+run() {
+    echo "This script will generate ssh-keys and gitconfig for personal and work profile if they don't already exists..."
+
+    read -p "Enter y to continue: " confirmation
+
+    if [[ $confirmation != "y" ]]; then
+        echo "Stopping...."
+        exit 1;
+    fi
+
+    if [[ ! -d $HOME/.config/git/ ]]; then
+        mkdir -p $HOME/.config/git
+    fi
+
+    for profile in "${profiles[@]}"; do
+        read -p "Enter email for $profile: " email
+
+        check_ssh $profile
+        if [[ $? -eq 1 ]]; then
+            echo "ssh-key not found... generating..."
+            ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/$profile
+            eval "$(ssh-agent -s)"
+            ssh-add $HOME/.ssh/$profile
+        fi
+
+        check_config $profile
+        if [[ $? -eq 1 ]]; then
+            echo "gitconfig not found for $profile... generating file..."
+            create_config_file $profile $email
+        fi
+    done 
+
+    echo "Replacing ~/.gitconfig with new settings"
+    update_git_root_config
+
+    echo "Git is now configured with separate ssh-keys and configs for private and work"
+}
+
+run
