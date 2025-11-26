@@ -47,10 +47,10 @@ update_git_root_config() {
 [commit]
 	gpgsign = true
 
-[includeIf "gitdir:~/projects/personal/"]
+[includeIf "gitdir:~/code/personal/"]
     path = ~/.config/git/personal.config
 
-[includeIf "gitdir:~/projects/work/"]
+[includeIf "gitdir:~/code/work/"]
     path = ~/.config/git/work.config
 EOF
 }
