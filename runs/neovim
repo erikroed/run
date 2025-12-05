@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# TODO: Get latest version from repo (curl endpoint for releases, get latest)
-VERSION=v0.11.5
-OUTPUT_DIR=$HOME/projects/neovim
+API_URL="https://api.github.com/repos/neovim/neovim/releases/latest"
+LATEST_VERSION=$(curl -s $API_URL | jq -r '.tag_name')
+OUTPUT_DIR=$HOME/code/neovim
 
 if [[ -d $OUTPUT_DIR ]]; then
     rm -rf $OUTPUT_DIR
 fi
 
-git clone -b $VERSION https://github.com/neovim/neovim.git $HOME/projects/neovim
+git clone -b $LATEST_VERSION https://github.com/neovim/neovim.git $OUTPUT_DIR
 sudo apt install cmake gettext lua5.1 liblua5.1-0-dev
 
 cd $OUTPUT_DIR
