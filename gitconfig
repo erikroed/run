@@ -30,7 +30,7 @@ create_config_file() {
 
     cat <<EOF > "$HOME/.config/git/$profile.config"
 [user]
-    name = Erik
+    name = Erik Røed
     email = $email
     signingkey = $HOME/.ssh/$profile.pub
 
