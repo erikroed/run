@@ -41,6 +41,9 @@ EOF
 
 update_git_root_config() {
     cat <<EOF > "$HOME/.gitconfig"
+[core]
+    editor = vim
+
 [gpg]
 	format = ssh
 
