@@ -7,7 +7,3 @@ wget -O $FILENAME https://github.com/obsidianmd/obsidian-releases/releases/downl
 sudo apt install ./$FILENAME
 
 rm $FILENAME
-
-sudo apt install ./$FILENAME
-
-rm $FILENAME
