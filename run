@@ -10,6 +10,12 @@ scripts=$(find ./runs -maxdepth 1 -mindepth 1 -executable -type f)
 while [[ $# > 0 ]]; do
     if [[ "$1" == "--dry" ]]; then
         dry="1"
+    elif [[ "$1" == "-l" || "$1" == "--list" ]]; then
+        echo "Available tools:"
+        for script in $scripts; do
+            basename "$script"
+        done | sort
+        exit 0
     else
         # Split comma-separated values and trim whitespace
         IFS=',' read -ra parts <<< "$1"
