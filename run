@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 script_dir="$(cd $(dirname "$BASH_SOURCE[0]}") && pwd)"
-filter=""
+filters=()
 dry="0"
 
 cd $script_dir
@@ -11,7 +11,12 @@ while [[ $# > 0 ]]; do
     if [[ "$1" == "--dry" ]]; then
         dry="1"
     else
-        filter="$1"
+        # Split comma-separated values and trim whitespace
+        IFS=',' read -ra parts <<< "$1"
+        for part in "${parts[@]}"; do
+            trimmed="$(echo "$part" | xargs)"
+            [[ -n "$trimmed" ]] && filters+=("$trimmed")
+        done
     fi
     shift
 done
@@ -33,10 +38,23 @@ execute() {
     "$@"
 }
 
-log "run: filter=$filter"
+matches_filter() {
+    local script="$1"
+    if [[ ${#filters[@]} -eq 0 ]]; then
+        return 0
+    fi
+    for f in "${filters[@]}"; do
+        if echo "$script" | grep -q "$f"; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+log "run: filters=${filters[*]}"
 
 for script in $scripts; do
-    if echo "$script" | grep -qv "$filter"; then
+    if ! matches_filter "$script"; then
         continue
     fi
     log "running script: $script"
