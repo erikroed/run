@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+FILENAME="install-opentofu.sh"
+
+curl -fsSL https://get.opentofu.org/install-opentofu.sh -o $FILENAME
+chmod +x $FILENAME
+
+./$FILENAME --install-method deb
+
+rm $FILENAME
