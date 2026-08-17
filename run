@@ -64,6 +64,6 @@ for script in $scripts; do
         continue
     fi
     log "running script: $script"
-    execute ./$script
+    execute "$script"
 done
 
