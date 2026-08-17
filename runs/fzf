@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 
-git clone https://github.com/junegunn/fzf.git $HOME/code/fzf
-$HOME/code/fzf/install
+if [ -d /opt/fzf ]; then
+  git -C /opt/fzf pull
+else
+  sudo git clone https://github.com/junegunn/fzf.git /opt/fzf
+  sudo chown -R $USER:$USER /opt/fzf
+fi
+/opt/fzf/install
+
