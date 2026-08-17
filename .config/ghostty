@@ -55,3 +55,4 @@ keybind = super+shift+k=goto_split:up
 keybind = super+shift+j=goto_split:down
 keybind = super+shift+r=reload_config
 keybind = super+shift+enter=toggle_split_zoom
+keybind = super+shift+e=new_split:down
