@@ -31,3 +31,18 @@ if [ -d "$HOME/.local/scripts" ]; then
     PATH="$HOME/.local/scripts:$PATH"
 fi
 
+__ssh_agent_socket="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ssh-agent.socket"
+if [ -S "$__ssh_agent_socket" ]; then
+    export SSH_AUTH_SOCK="$__ssh_agent_socket"
+
+    if ! ssh-add -l > /dev/null 2>&1; then
+        __gitconfig_env="${XDG_CONFIG_HOME:-$HOME/.config}/run/gitconfig.env"
+        if [ -r "$__gitconfig_env" ]; then
+            __ssh_key="$HOME/.ssh/$(. "$__gitconfig_env"; echo "$SSH_KEY")"
+            [ -f "$__ssh_key" ] && ssh-add -q "$__ssh_key"
+            unset __ssh_key
+        fi
+        unset __gitconfig_env
+    fi
+fi
+unset __ssh_agent_socket

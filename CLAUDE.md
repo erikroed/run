@@ -23,7 +23,7 @@ There is no build system, test suite, or linter.
 - **`run`** — Main orchestrator. Discovers and sequentially executes all executable files in `runs/`. Accepts an optional filter argument to match specific scripts.
 - **`runs/`** — ~38 standalone bash installer scripts, each named after the tool they install (e.g., `runs/docker`, `runs/go`, `runs/neovim`). Scripts are independent with no inter-dependencies.
 - **`dev`** — Copies config directories from `.config/` and `.local/` plus shell dotfiles (`.bash_aliases`, `.bash_profile`) to the user's home directory.
-- **`gitconfig`** — Configures the machine's single Git identity and SSH key. Values resolve from environment variable, then the previous run's cache, then an interactive prompt, and are rendered from `templates/`.
+- **`gitconfig`** — Configures the machine's single Git identity and SSH key, and installs the ssh-agent systemd user service. Values resolve from environment variable, then the previous run's cache, then an interactive prompt, and are rendered from `templates/`.
 
 ### Dotfiles / Configuration
 

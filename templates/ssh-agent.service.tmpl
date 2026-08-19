@@ -1,0 +1,10 @@
+[Unit]
+Description=SSH key agent
+
+[Service]
+Type=simple
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+ExecStart={{ SSH_AGENT }} -D -a $SSH_AUTH_SOCK
+
+[Install]
+WantedBy=default.target
