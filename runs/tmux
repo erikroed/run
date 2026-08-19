@@ -5,7 +5,6 @@ PLUGIN_DIR=$HOME/.local/share/tmux/plugins/catppuccin
 
 sudo apt install -y tmux
 
-# the plugin lives outside ~/.config/tmux because ./dev replaces that directory
 if [[ -d $PLUGIN_DIR ]]; then
     git -C $PLUGIN_DIR pull --ff-only
 else

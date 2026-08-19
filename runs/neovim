@@ -12,8 +12,6 @@ else
     sudo chown -R $USER:$USER $INSTALL_DIR
 fi
 
-# neovim keeps a moving "stable" tag on the latest release, so the version can
-# be resolved without calling the GitHub API
 version=$(git -C $INSTALL_DIR tag --points-at stable | grep -m1 '^v' || true)
 
 if [[ -z $version ]]; then
@@ -35,7 +33,6 @@ echo "installing neovim $version${installed:+ (replacing $installed)}"
 
 git -C $INSTALL_DIR checkout --force $version
 
-# a build tree from another version cannot be reused
 if [[ -d $INSTALL_DIR/build ]]; then
     make -C $INSTALL_DIR distclean
 fi

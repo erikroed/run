@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# a missing fzf would otherwise look exactly like cancelling the picker: the
-# window tmux opened for this script closes again right away
 if ! command -v fzf > /dev/null; then
 	echo "tmux-sessionizer: fzf not found in PATH" >&2
 	if [[ -n "$TMUX" ]]; then
