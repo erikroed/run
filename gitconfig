@@ -1,99 +1,190 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-profiles=("personal" "work")
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+templates_dir="$script_dir/templates"
 
-check_ssh() {
-    local profile_name=$1
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"
+cache_file="$config_dir/run/gitconfig.env"
 
-    local exists=1
-    if [[ -f "$HOME/.ssh/$profile_name" ]]; then
-        exists=0
-    fi
+begin_marker="# >>> managed by run/gitconfig >>>"
+end_marker="# <<< managed by run/gitconfig <<<"
 
-    return $exists
+declare -A cached
+
+die() {
+    echo "gitconfig: $*" >&2
+    exit 1
 }
 
-check_config() {
-    local profile_name=$1
+usage() {
+    cat <<EOF
+Usage: ./gitconfig
 
-    exists=1
-    if [[ -f "$HOME/.config/git/$profile_name.config" ]]; then
-        exists=0
-    fi
+Configures the git identity and SSH key for this machine. One identity per
+machine: values are resolved from the environment, then from the previous
+run ($cache_file), then by prompting.
 
-    return $exists
-}
+Environment variables:
+  GIT_NAME      name recorded on commits
+  GIT_EMAIL     email recorded on commits
+  GITHUB_USER   github.com account the key is added to
+  SSH_KEY       key name under ~/.ssh (default: github)
 
-create_config_file() {
-    local profile=$1
-    local email=$2
-
-    cat <<EOF > "$HOME/.config/git/$profile.config"
-[user]
-    name = Erik Røed
-    email = $email
-    signingkey = $HOME/.ssh/$profile.pub
-
-[core]
-    sshCommand = "ssh -i $HOME/.ssh/$profile"
+Set all four to run unattended.
 EOF
 }
 
-update_git_root_config() {
-    cat <<EOF > "$HOME/.gitconfig"
-[core]
-    editor = vim
+load_cache() {
+    [[ -r $cache_file ]] || return 0
 
-[gpg]
-	format = ssh
+    local line key value
+    while IFS= read -r line; do
+        [[ $line == *=* ]] || continue
+        key=${line%%=*}
+        value=${line#*=}
+        value=${value#\"}
+        value=${value%\"}
+        cached[$key]=$value
+    done < "$cache_file"
+}
 
-[commit]
-	gpgsign = true
+resolve() {
+    local var=$1 prompt=$2 fallback=${3:-}
+    local default answer
 
-[includeIf "gitdir:~/code/personal/"]
-    path = ~/.config/git/personal.config
+    [[ -z ${!var:-} ]] || return 0
 
-[includeIf "gitdir:~/code/work/"]
-    path = ~/.config/git/work.config
+    default=${cached[$var]:-$fallback}
+
+    if [[ ! -t 0 ]]; then
+        [[ -n $default ]] || die "$var is unset and has no cached value; export it to run unattended"
+        printf -v "$var" '%s' "$default"
+        return 0
+    fi
+
+    if [[ -n $default ]]; then
+        read -r -p "$prompt [$default]: " answer
+    else
+        read -r -p "$prompt: " answer
+    fi
+
+    printf -v "$var" '%s' "${answer:-$default}"
+    [[ -n ${!var} ]] || die "$var must not be empty"
+}
+
+render() {
+    local template=$1
+    local line var value placeholder
+
+    [[ -f $template ]] || die "template not found: $template"
+
+    while IFS= read -r line || [[ -n $line ]]; do
+        while [[ $line =~ \{\{[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*\}\} ]]; do
+            placeholder=${BASH_REMATCH[0]}
+            var=${BASH_REMATCH[1]}
+            value=${!var:-}
+            [[ -n $value ]] || die "$template references $var, which is not set"
+            line=${line//"$placeholder"/$value}
+        done
+        printf '%s\n' "$line"
+    done < "$template"
+}
+
+replace_managed_block() {
+    local file=$1 position=$2
+    local block rest tmp
+
+    block=$(cat)
+    mkdir -p "$(dirname "$file")"
+    [[ -f $file ]] || touch "$file"
+
+    rest=$(awk -v b="$begin_marker" -v e="$end_marker" '
+        $0 == b { skip = 1; next }
+        $0 == e { skip = 0; next }
+        !skip
+    ' "$file")
+
+    tmp=$(mktemp)
+    if [[ $position == "prepend" ]]; then
+        printf '%s\n%s\n%s\n\n%s\n' "$begin_marker" "$block" "$end_marker" "$rest" > "$tmp"
+    else
+        printf '%s\n\n%s\n%s\n%s\n' "$rest" "$begin_marker" "$block" "$end_marker" > "$tmp"
+    fi
+
+    awk 'NF == 0 { blank = 1; next } { if (blank && seen) print ""; blank = 0; seen = 1; print }' "$tmp" > "$file"
+    rm -f "$tmp"
+}
+
+ensure_ssh_key() {
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+
+    if [[ -f $SSH_KEY_PATH ]]; then
+        echo "ssh key $SSH_KEY_PATH already exists"
+        return 0
+    fi
+
+    echo "generating ssh key $SSH_KEY_PATH"
+    ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$SSH_KEY_PATH" -N ""
+}
+
+write_git_config() {
+    local content
+    content=$(render "$templates_dir/gitconfig.tmpl")
+
+    replace_managed_block "$HOME/.gitconfig" append <<<"$content"
+}
+
+write_ssh_config() {
+    local content
+    content=$(render "$templates_dir/ssh_config.tmpl")
+
+    replace_managed_block "$HOME/.ssh/config" prepend <<<"$content"
+    chmod 600 "$HOME/.ssh/config"
+}
+
+persist_cache() {
+    mkdir -p "$(dirname "$cache_file")"
+    cat > "$cache_file" <<EOF
+GIT_NAME="$GIT_NAME"
+GIT_EMAIL="$GIT_EMAIL"
+GITHUB_USER="$GITHUB_USER"
+SSH_KEY="$SSH_KEY"
 EOF
 }
 
-run() {
-    echo "This script will generate ssh-keys and gitconfig for personal and work profile if they don't already exists..."
+main() {
+    case "${1:-}" in
+        -h|--help) usage; exit 0 ;;
+        "") ;;
+        *) usage >&2; die "unexpected argument '$1'" ;;
+    esac
 
-    read -p "Enter y to continue: " confirmation
+    load_cache
 
-    if [[ $confirmation != "y" ]]; then
-        echo "Stopping...."
-        exit 1;
-    fi
+    resolve GIT_NAME "Name for commits" "$(git config --global user.name || true)"
+    resolve GIT_EMAIL "Email for commits" "$(git config --global user.email || true)"
+    resolve GITHUB_USER "GitHub username"
+    resolve SSH_KEY "SSH key name under ~/.ssh" "github"
 
-    if [[ ! -d $HOME/.config/git/ ]]; then
-        mkdir -p $HOME/.config/git
-    fi
+    SSH_KEY_PATH="$HOME/.ssh/$SSH_KEY"
+    SSH_PUBLIC_KEY="$SSH_KEY_PATH.pub"
 
-    for profile in "${profiles[@]}"; do
-        read -p "Enter email for $profile: " email
+    echo "configuring git for $GIT_NAME <$GIT_EMAIL>"
 
-        check_ssh $profile
-        if [[ $? -eq 1 ]]; then
-            echo "ssh-key not found... generating..."
-            ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/$profile
-            eval "$(ssh-agent -s)"
-            ssh-add $HOME/.ssh/$profile
-        fi
+    ensure_ssh_key
+    write_git_config
+    write_ssh_config
+    persist_cache
 
-        check_config $profile
-        if [[ $? -eq 1 ]]; then
-            echo "gitconfig not found for $profile... generating file..."
-            create_config_file $profile $email
-        fi
-    done 
-
-    echo "Replacing ~/.gitconfig with new settings"
-    update_git_root_config
-
-    echo "Git is now configured with separate ssh-keys and configs for private and work"
+    echo
+    echo "public key:"
+    cat "$SSH_PUBLIC_KEY"
+    echo
+    echo "add it to github.com/$GITHUB_USER as both an authentication and a signing key:"
+    echo "  gh ssh-key add $SSH_PUBLIC_KEY --type authentication"
+    echo "  gh ssh-key add $SSH_PUBLIC_KEY --type signing"
 }
 
-run
+main "$@"

@@ -13,7 +13,7 @@ Personal developer environment setup repository — a collection of bash install
 ./run <tool>       # Run a specific installer (e.g., ./run docker)
 ./run --dry <tool> # Dry-run to preview which scripts would execute
 ./dev              # Copy dotfiles and configs to system directories (~/.config/, ~/.local/, etc.)
-./gitconfig        # Interactive setup for dual personal/work Git profiles with separate SSH keys
+./gitconfig        # Set up this machine's Git identity and SSH key (one identity per machine)
 ```
 
 There is no build system, test suite, or linter.
@@ -23,7 +23,7 @@ There is no build system, test suite, or linter.
 - **`run`** — Main orchestrator. Discovers and sequentially executes all executable files in `runs/`. Accepts an optional filter argument to match specific scripts.
 - **`runs/`** — ~38 standalone bash installer scripts, each named after the tool they install (e.g., `runs/docker`, `runs/go`, `runs/neovim`). Scripts are independent with no inter-dependencies.
 - **`dev`** — Copies config directories from `.config/` and `.local/` plus shell dotfiles (`.bash_aliases`, `.bash_profile`) to the user's home directory.
-- **`gitconfig`** — Interactive script that sets up conditional git includes and separate SSH keys for personal vs. work directories.
+- **`gitconfig`** — Configures the machine's single Git identity and SSH key. Values resolve from environment variable, then the previous run's cache, then an interactive prompt, and are rendered from `templates/`.
 
 ### Dotfiles / Configuration
 
