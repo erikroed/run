@@ -32,4 +32,4 @@ fi
 
 tmux new-session -ds $selected_name -c $selected
 switch_to
-tmux send-keys -t $selected_name "ready-tmux" 
+tmux send-keys -t $selected_name "ready-tmux" Enter
