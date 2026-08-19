@@ -26,6 +26,21 @@ cd run
 ./dev
 ```
 
+## Project layout
+
+Projects live directly in `$HOME/code`:
+
+```
+~/code/
+├── run
+├── homelab
+└── ...
+```
+
+`tmux-sessionizer` lists the directories immediately under `~/code`, so
+anything placed there shows up in the project switcher. Build trees and
+downloads belong in `~/.cache` instead — see `runs/neovim` and `runs/k8sgpt`.
+
 ## Bluetooth audio auto-switching
 
 Makes the system automatically switch audio output to a Bluetooth headset when it connects, and back to the default speakers when it disconnects.
