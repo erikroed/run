@@ -26,69 +26,19 @@ cd run
 ./dev
 ```
 
-## Bluetooth audio auto-switching
+## Project layout
 
-Makes the system automatically switch audio output to a Bluetooth headset when it connects, and back to the default speakers when it disconnects.
-
-### 1. Find your preferred fallback sink name
-
-```bash
-pactl list sinks short
-```
-
-Note the name of the sink you want as your default (e.g. your USB audio adapter).
-
-### 2. Create the WirePlumber config file
-
-```bash
-mkdir -p ~/.config/wireplumber/wireplumber.conf.d
-```
-
-Create `~/.config/wireplumber/wireplumber.conf.d/51-bluetooth-auto-switch.conf`:
+Projects live directly in `$HOME/code`:
 
 ```
-monitor.bluez.rules = [
-  {
-    matches = [{ device.name = "~bluez_card.*" }]
-    actions = {
-      update-props = {
-        bluez5.auto-connect = [ hfp_hf hsp_hs a2dp_sink hfp_ag hsp_ag a2dp_source ]
-        bluez5.hw-volume    = [ hfp_hf hsp_hs a2dp_sink hfp_ag hsp_ag a2dp_source ]
-      }
-    }
-  }
-  {
-    matches = [
-      { node.name = "~bluez_input.*" }
-      { node.name = "~bluez_output.*" }
-    ]
-    actions = {
-      update-props = {
-        priority.session = 2000
-      }
-    }
-  }
-]
-
-monitor.alsa.rules = [
-  {
-    matches = [
-      { node.name = "<YOUR_SINK_NAME_HERE>" }
-    ]
-    actions = {
-      update-props = {
-        priority.session = 1500
-      }
-    }
-  }
-]
+~/code/
+├── run
+├── homelab
+└── ...
 ```
 
-Replace `<YOUR_SINK_NAME_HERE>` with the sink name from step 1.
+`tmux-sessionizer` lists the directories immediately under `~/code`, so
+anything placed there shows up in the project switcher. Nothing installed by
+`./run` belongs there: tools built from source live in `/opt` (`runs/fzf`,
+`runs/neovim`) and downloads use a temporary directory (`runs/k8sgpt`).
 
-### 3. Clear any pinned default and restart WirePlumber
-
-```bash
-wpctl clear-default 0
-systemctl --user restart wireplumber
-```

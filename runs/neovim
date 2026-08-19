@@ -1,16 +1,41 @@
 #!/usr/bin/env bash
+set -eu
 
-API_URL="https://api.github.com/repos/neovim/neovim/releases/latest"
-LATEST_VERSION=$(curl -s $API_URL | jq -r '.tag_name')
-OUTPUT_DIR=$HOME/code/neovim
+INSTALL_DIR=/opt/neovim
 
-if [[ -d $OUTPUT_DIR ]]; then
-    rm -rf $OUTPUT_DIR
+sudo apt install -y ninja-build gettext cmake curl build-essential
+
+if [[ -d $INSTALL_DIR ]]; then
+    git -C $INSTALL_DIR fetch --tags --force --prune
+else
+    sudo git clone https://github.com/neovim/neovim.git $INSTALL_DIR
+    sudo chown -R $USER:$USER $INSTALL_DIR
 fi
 
-git clone -b $LATEST_VERSION https://github.com/neovim/neovim.git $OUTPUT_DIR
-sudo apt install cmake gettext lua5.1 liblua5.1-0-dev
+version=$(git -C $INSTALL_DIR tag --points-at stable | grep -m1 '^v' || true)
 
-cd $OUTPUT_DIR
-make CMAKE_BUILD_TYPE=RelWithDebInfo
-sudo make install
+if [[ -z $version ]]; then
+    echo "could not resolve a release from the stable tag" >&2
+    exit 1
+fi
+
+installed=""
+if command -v nvim > /dev/null; then
+    installed=$(nvim --version | awk 'NR==1 {print $2; exit}')
+fi
+
+if [[ $installed == "$version" ]]; then
+    echo "neovim $version is already installed"
+    exit 0
+fi
+
+echo "installing neovim $version${installed:+ (replacing $installed)}"
+
+git -C $INSTALL_DIR checkout --force $version
+
+if [[ -d $INSTALL_DIR/build ]]; then
+    make -C $INSTALL_DIR distclean
+fi
+
+make -C $INSTALL_DIR CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make -C $INSTALL_DIR install

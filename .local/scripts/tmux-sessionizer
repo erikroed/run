@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-selected=$(find ~/code/personal ~/code/work -mindepth 1 -maxdepth 1 -type d | fzf)
+if ! command -v fzf > /dev/null; then
+	echo "tmux-sessionizer: fzf not found in PATH" >&2
+	if [[ -n "$TMUX" ]]; then
+		tmux display-message "tmux-sessionizer: fzf not found in PATH"
+	fi
+	exit 1
+fi
+
+selected=$(find ~/code -mindepth 1 -maxdepth 1 -type d | fzf)
 if [[ -z "$selected" ]]; then
 	exit 0
 fi
@@ -22,4 +30,4 @@ fi
 
 tmux new-session -ds $selected_name -c $selected
 switch_to
-tmux send-keys -t $selected_name "ready-tmux" 
+tmux send-keys -t $selected_name "ready-tmux" Enter
