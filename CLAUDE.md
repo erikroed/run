@@ -36,6 +36,7 @@ There is no build system, test suite, or linter.
 ## Conventions
 
 - All bash scripts use `#!/usr/bin/env bash` shebang and must be executable.
+- Scripts carry no explanatory comments; rationale belongs in the commit message.
 - Installation scripts use `sudo` for system-level installs and clean up temporary files after download.
 - Git clone operations in scripts use HTTPS (not SSH).
 - Commit messages follow `type(scope): message` format (e.g., `fix(fzf): use HTTPS instead of SSH`).
