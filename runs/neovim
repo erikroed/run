@@ -2,8 +2,6 @@
 set -eu
 
 INSTALL_DIR=/opt/neovim
-# stable tracks the latest release, nightly the daily bleeding-edge build
-CHANNEL="${NEOVIM_CHANNEL:-stable}"
 
 sudo apt install -y ninja-build gettext cmake curl build-essential
 
@@ -14,26 +12,28 @@ else
     sudo chown -R $USER:$USER $INSTALL_DIR
 fi
 
-# both channels are moving tags, so resolve them to a commit
-if ! target=$(git -C $INSTALL_DIR rev-parse --verify --quiet "refs/tags/$CHANNEL^{commit}"); then
-    echo "unknown neovim channel '$CHANNEL' (expected stable or nightly)" >&2
+# neovim keeps a moving "stable" tag on the latest release, so the version can
+# be resolved without calling the GitHub API
+version=$(git -C $INSTALL_DIR tag --points-at stable | grep -m1 '^v' || true)
+
+if [[ -z $version ]]; then
+    echo "could not resolve a release from the stable tag" >&2
     exit 1
 fi
 
-# nightly reports its version as v0.13.0-dev-..., which never matches the tag
-# name, so compare commits rather than version strings
-stamp=$INSTALL_DIR/.installed-commit
 installed=""
-[[ -r $stamp ]] && installed=$(<"$stamp")
+if command -v nvim > /dev/null; then
+    installed=$(nvim --version | awk 'NR==1 {print $2; exit}')
+fi
 
-if [[ $installed == "$target" ]] && command -v nvim > /dev/null; then
-    echo "neovim $CHANNEL is up to date ($(nvim --version | awk 'NR==1 {print $2; exit}'))"
+if [[ $installed == "$version" ]]; then
+    echo "neovim $version is already installed"
     exit 0
 fi
 
-echo "building neovim $CHANNEL ($(git -C $INSTALL_DIR describe --tags "$target"))"
+echo "installing neovim $version${installed:+ (replacing $installed)}"
 
-git -C $INSTALL_DIR checkout --force "$target"
+git -C $INSTALL_DIR checkout --force $version
 
 # a build tree from another version cannot be reused
 if [[ -d $INSTALL_DIR/build ]]; then
@@ -42,6 +42,3 @@ fi
 
 make -C $INSTALL_DIR CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make -C $INSTALL_DIR install
-
-echo "$target" > "$stamp"
-nvim --version | awk 'NR==1'
