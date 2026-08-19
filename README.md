@@ -38,8 +38,9 @@ Projects live directly in `$HOME/code`:
 ```
 
 `tmux-sessionizer` lists the directories immediately under `~/code`, so
-anything placed there shows up in the project switcher. Build trees and
-downloads belong in `~/.cache` instead — see `runs/neovim` and `runs/k8sgpt`.
+anything placed there shows up in the project switcher. Nothing installed by
+`./run` belongs there: tools built from source live in `/opt` (`runs/fzf`,
+`runs/neovim`) and downloads use a temporary directory (`runs/k8sgpt`).
 
 ## Bluetooth audio auto-switching
 
