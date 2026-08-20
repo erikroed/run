@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-sudo apt install bat
+sudo apt install -y bat
 
 echo "Ensure the ./dev is run to alias bat to cat"

@@ -2,9 +2,9 @@
 
 FILENAME="install-opentofu.sh"
 
-curl -fsSL https://get.opentofu.org/install-opentofu.sh -o $FILENAME
-chmod +x $FILENAME
+curl -fsSL https://get.opentofu.org/install-opentofu.sh -o "$FILENAME"
+chmod +x "$FILENAME"
 
-./$FILENAME --install-method deb
+"./$FILENAME" --install-method deb
 
-rm $FILENAME
+rm "$FILENAME"

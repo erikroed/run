@@ -2,8 +2,8 @@
  
 FILENAME="discord.deb"
 
-wget -O $FILENAME https://discord.com/api/download?platform=linux&format=deb 
+wget -O "$FILENAME" "https://discord.com/api/download?platform=linux&format=deb"
 
-sudo apt install ./$FILENAME
+sudo apt install -y "./$FILENAME"
 
-rm $FILENAME
+rm "$FILENAME"

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-OUTPUT_DIR=$(mktemp -d)
+OUTPUT_DIR="$(mktemp -d)"
 
-curl -L -o $OUTPUT_DIR/k8sgpt_Linux_x86_64.tar.gz \
+curl -L -o "$OUTPUT_DIR/k8sgpt_Linux_x86_64.tar.gz" \
     https://github.com/k8sgpt-ai/k8sgpt/releases/latest/download/k8sgpt_Linux_x86_64.tar.gz
 
-tar -xzf $OUTPUT_DIR/k8sgpt_Linux_x86_64.tar.gz -C $OUTPUT_DIR/
-sudo mv $OUTPUT_DIR/k8sgpt /usr/local/bin/
+tar -xzf "$OUTPUT_DIR/k8sgpt_Linux_x86_64.tar.gz" -C "$OUTPUT_DIR/"
+sudo mv "$OUTPUT_DIR/k8sgpt" /usr/local/bin/
 
-rm -rf $OUTPUT_DIR
+rm -rf "$OUTPUT_DIR"

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-script_dir="$(cd $(dirname "$BASH_SOURCE[0]}") && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 dry="0"
 
-cd $script_dir
-scripts=$(find ./runs -maxdepth 1 -mindepth 1 -executable -type f)
+cd "$script_dir"
 
 while [[ $# > 0 ]]; do
     if [[ "$1" == "--dry" ]]; then
@@ -36,11 +35,11 @@ copy_dir() {
 	from=$1
 	to=$2
 
-	pushd $from > /dev/null
-	dirs=$(find . -mindepth 1 -maxdepth 1 -type d)
-	for dir in $dirs; do
-		execute rm -rf $to/$dir
-		execute cp -r $dir $to/$dir
+	pushd "$from" > /dev/null
+	mapfile -d '' -t dirs < <(find . -mindepth 1 -maxdepth 1 -type d -print0)
+	for dir in "${dirs[@]}"; do
+		execute rm -rf "$to/$dir"
+		execute cp -r "$dir" "$to/$dir"
 	done
 	popd > /dev/null
 }
@@ -49,15 +48,15 @@ copy_file() {
 	from=$1
 	to=$2
 
-	name=$(basename $from)
+	name=$(basename "$from")
 	
-	execute rm $to/$name
-	execute cp $from $to/$name
+	execute rm "$to/$name"
+	execute cp "$from" "$to/$name"
 }
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
-copy_dir .config $CONFIG_DIR
-copy_dir .local $HOME/.local
-copy_file .bash_aliases $HOME
-copy_file .bash_profile $HOME
+copy_dir .config "$CONFIG_DIR"
+copy_dir .local "$HOME/.local"
+copy_file .bash_aliases "$HOME"
+copy_file .bash_profile "$HOME"
