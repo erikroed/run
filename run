@@ -5,14 +5,14 @@ filters=()
 dry="0"
 
 cd "$script_dir"
-scripts=$(find ./runs -maxdepth 1 -mindepth 1 -executable -type f)
+mapfile -d '' -t scripts < <(find ./runs -maxdepth 1 -mindepth 1 -executable -type f -print0)
 
 while [[ $# > 0 ]]; do
     if [[ "$1" == "--dry" ]]; then
         dry="1"
     elif [[ "$1" == "-l" || "$1" == "--list" ]]; then
         echo "Available tools:"
-        for script in $scripts; do
+        for script in "${scripts[@]}"; do
             basename "$script"
         done | sort
         exit 0
@@ -59,7 +59,7 @@ matches_filter() {
 
 log "run: filters=${filters[*]}"
 
-for script in $scripts; do
+for script in "${scripts[@]}"; do
     if ! matches_filter "$script"; then
         continue
     fi
