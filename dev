@@ -4,7 +4,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 dry="0"
 
 cd "$script_dir"
-scripts=$(find ./runs -maxdepth 1 -mindepth 1 -executable -type f)
 
 while [[ $# > 0 ]]; do
     if [[ "$1" == "--dry" ]]; then
