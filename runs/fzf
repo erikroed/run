@@ -4,7 +4,7 @@ if [ -d /opt/fzf ]; then
   git -C /opt/fzf pull
 else
   sudo git clone https://github.com/junegunn/fzf.git /opt/fzf
-  sudo chown -R $USER:$USER /opt/fzf
+  sudo chown -R "$USER:$USER" /opt/fzf
 fi
 /opt/fzf/install
 

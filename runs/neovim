@@ -5,16 +5,16 @@ INSTALL_DIR=/opt/neovim
 
 sudo apt install -y ninja-build gettext cmake curl build-essential
 
-if [[ -d $INSTALL_DIR ]]; then
-    git -C $INSTALL_DIR fetch --tags --force --prune
+if [[ -d "$INSTALL_DIR" ]]; then
+    git -C "$INSTALL_DIR" fetch --tags --force --prune
 else
-    sudo git clone https://github.com/neovim/neovim.git $INSTALL_DIR
-    sudo chown -R $USER:$USER $INSTALL_DIR
+    sudo git clone https://github.com/neovim/neovim.git "$INSTALL_DIR"
+    sudo chown -R "$USER:$USER" "$INSTALL_DIR"
 fi
 
-version=$(git -C $INSTALL_DIR tag --points-at stable | grep -m1 '^v' || true)
+version=$(git -C "$INSTALL_DIR" tag --points-at stable | grep -m1 '^v' || true)
 
-if [[ -z $version ]]; then
+if [[ -z "$version" ]]; then
     echo "could not resolve a release from the stable tag" >&2
     exit 1
 fi
@@ -24,18 +24,18 @@ if command -v nvim > /dev/null; then
     installed=$(nvim --version | awk 'NR==1 {print $2; exit}')
 fi
 
-if [[ $installed == "$version" ]]; then
+if [[ "$installed" == "$version" ]]; then
     echo "neovim $version is already installed"
     exit 0
 fi
 
 echo "installing neovim $version${installed:+ (replacing $installed)}"
 
-git -C $INSTALL_DIR checkout --force $version
+git -C "$INSTALL_DIR" checkout --force "$version"
 
-if [[ -d $INSTALL_DIR/build ]]; then
-    make -C $INSTALL_DIR distclean
+if [[ -d "$INSTALL_DIR/build" ]]; then
+    make -C "$INSTALL_DIR" distclean
 fi
 
-make -C $INSTALL_DIR CMAKE_BUILD_TYPE=RelWithDebInfo
-sudo make -C $INSTALL_DIR install
+make -C "$INSTALL_DIR" CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make -C "$INSTALL_DIR" install
