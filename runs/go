@@ -3,13 +3,19 @@
 VERSION=1.26.2
 
 wget https://go.dev/dl/go$VERSION.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf go$VERSION.linux-amd64.tar.gz
 
 rm go$VERSION.linux-amd64.tar.gz
 
-echo -e "\nPATH=\"\$PATH:/usr/local/go/bin\"" >> ~/.bashrc
+if ! grep -q '/usr/local/go/bin' ~/.bashrc; then
+    echo -e "\nPATH=\"\$PATH:/usr/local/go/bin\"" >> ~/.bashrc
+fi
 
-export PATH=$PATH:/usr/local/go/bin
+case ":$PATH:" in
+    *:"/usr/local/go/bin":*) ;;
+    *) export PATH="$PATH:/usr/local/go/bin" ;;
+esac
 
 # Install debugger
 go install github.com/go-delve/delve/cmd/dlv@latest
